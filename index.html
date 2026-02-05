@@ -12,7 +12,8 @@
       --hot:#ff2e63;
       --white:#ffffff;
     }
-    *{box-sizing:border-box}
+    *{ box-sizing:border-box; }
+
     body{
       margin:0;
       height:100vh;
@@ -22,14 +23,21 @@
       color: var(--white);
     }
 
-    /* Floating hearts */
-    .hearts{position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:0;}
+    /* Floating hearts background */
+    .hearts{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      z-index:0;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.35));
+    }
     .heart{
       position:absolute;
+      opacity:.9;
       animation: floatUp linear infinite;
       will-change: transform, opacity;
       text-shadow: 0 8px 18px rgba(0,0,0,.35);
-      opacity:.9;
     }
     @keyframes floatUp{
       0%   {transform: translate3d(0, 110vh, 0) rotate(0deg) scale(1); opacity:0}
@@ -37,6 +45,7 @@
       100% {transform: translate3d(0, -20vh, 0) rotate(360deg) scale(1.35); opacity:0}
     }
 
+    /* Main card */
     .wrap{
       position:relative;
       z-index:2;
@@ -44,21 +53,22 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:40px;
+      padding: 40px;
     }
     .card{
       width:min(980px, 92vw);
-      border-radius:28px;
-      padding:56px 56px 44px;
+      border-radius: 28px;
+      padding: 56px 56px 44px;
       background: rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.12);
       backdrop-filter: blur(10px);
       box-shadow: 0 24px 70px rgba(0,0,0,.45);
       position:relative;
       overflow:hidden;
     }
     .glow{
-      position:absolute; inset:-60px;
+      position:absolute;
+      inset:-60px;
       background:
         radial-gradient(400px 250px at 20% 20%, rgba(255,79,216,.22), transparent 65%),
         radial-gradient(500px 300px at 80% 30%, rgba(124,77,255,.18), transparent 70%),
@@ -66,36 +76,37 @@
       pointer-events:none;
       z-index:0;
     }
-    .content{position:relative; z-index:1;}
+    .content{ position:relative; z-index:1; }
 
     h1{
-      margin:0 0 26px;
-      font-size:44px;
+      margin:0 0 22px;
+      font-size: 44px;
       line-height:1.12;
-      letter-spacing:.8px;
-      font-weight:900;
-      text-transform:uppercase;
+      letter-spacing: .8px;
+      font-weight: 900;
+      text-transform: uppercase;
       text-align:center;
       text-shadow: 0 10px 28px rgba(0,0,0,.55);
     }
     .sub{
       text-align:center;
-      margin:0 0 34px;
+      margin: 0 0 30px;
       opacity:.85;
-      font-weight:600;
+      font-weight: 600;
+      letter-spacing:.2px;
     }
 
-    /* ACTIONS: side-by-side layout always */
+    /* Actions area */
     .actions{
-      position:relative; /* NO runs inside this area */
+      position:relative;
       width:min(760px, 95%);
-      margin:0 auto;
+      margin: 0 auto;
       display:flex;
       justify-content:center;
       align-items:center;
-      gap:24px;
-      padding:18px 18px;
-      border-radius:22px;
+      gap: 24px;
+      padding: 18px;
+      border-radius: 22px;
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.12);
       height: 130px; /* playfield height for NO */
@@ -105,27 +116,28 @@
     button{
       border:0;
       cursor:pointer;
-      padding:18px 34px;
-      border-radius:18px;
-      font-weight:900;
+      padding: 18px 34px;
+      border-radius: 18px;
+      font-weight: 900;
       letter-spacing:.6px;
-      font-size:20px;
+      font-size: 20px;
       box-shadow: 0 18px 36px rgba(0,0,0,.35);
       transition: transform .12s ease, filter .12s ease;
       user-select:none;
       -webkit-tap-highlight-color: transparent;
       white-space:nowrap;
     }
-    button:active{transform: translateY(1px) scale(.99)}
+    button:active{ transform: translateY(1px) scale(.99); }
 
     .yes{
-      background: linear-gradient(135deg, #ff4fd8, #ff2e63);
+      background: linear-gradient(135deg, var(--pink), var(--hot));
       color:#120713;
-      z-index:2;
       position:relative;
+      z-index: 9999; /* always clickable */
     }
+    .yes:hover{ filter: brightness(1.06); }
 
-    /* Spacer reserves space in flex for NO so buttons appear side-by-side */
+    /* Spacer reserves the side-by-side position for NO (visual only) */
     .no-spacer{
       width: 190px;
       height: 64px;
@@ -133,67 +145,59 @@
       border: 1px dashed rgba(255,255,255,.18);
       background: rgba(255,255,255,.05);
       opacity:.35;
+      pointer-events:none; /* IMPORTANT: never block YES */
     }
 
-    /* Actual NO button is absolute + unclickable */
+    /* Real NO button runs away, never clickable */
     .no{
       background: rgba(255,255,255,.12);
       color: rgba(255,255,255,.92);
       border: 1px solid rgba(255,255,255,.18);
       position:absolute;
-      z-index:3;
-      pointer-events:none; /* cannot be clicked */
+      z-index: 10;          /* below YES */
+      pointer-events:none;  /* can't click NO */
+      cursor: default;
     }
 
-    .success{display:none; text-align:center; margin-top:18px;}
-    .success h2{
-      margin:10px 0 10px;
-      font-size:40px;
-      font-weight:1000;
+    /* Success screen */
+    .success{
+      display:none;
+      text-align:center;
+      margin-top: 18px;
+    }
+    #yeah{
+      margin: 0 0 10px;
+      font-size: 46px;
+      font-weight: 1000;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-shadow: 0 10px 28px rgba(0,0,0,.55);
+    }
+    .success h3{
+      margin: 0 0 12px;
+      font-size: 40px;
+      font-weight: 1000;
       letter-spacing:.8px;
-      text-transform:uppercase;
+      text-transform: uppercase;
       text-shadow: 0 10px 28px rgba(0,0,0,.55);
     }
     .gif{
-      width:min(520px, 80%);
-      border-radius:22px;
-      margin:14px auto 0;
+      width:min(560px, 86%);
+      border-radius: 22px;
+      margin: 14px auto 0;
       display:block;
       border: 1px solid rgba(255,255,255,.14);
       box-shadow: 0 24px 70px rgba(0,0,0,.45);
     }
 
-    .graffiti{position:fixed; inset:0; z-index:3; pointer-events:none; display:none;}
-    .tag{
-      position:absolute;
-      font-weight:1000;
-      letter-spacing:.5px;
-      transform: rotate(var(--rot));
-      opacity:.92;
-      text-shadow: 0 2px 0 rgba(0,0,0,.25), 0 10px 24px rgba(0,0,0,.45);
-      mix-blend-mode: screen;
-      white-space:nowrap;
-    }
-    .tag::after{
-      content:"";
-      position:absolute;
-      inset:-10px -14px;
-      border-radius:18px;
-      background:
-        radial-gradient(120px 60px at 30% 40%, rgba(255,79,216,.25), transparent 70%),
-        radial-gradient(130px 70px at 70% 60%, rgba(124,77,255,.22), transparent 70%),
-        radial-gradient(120px 60px at 40% 70%, rgba(255,46,99,.22), transparent 70%);
-      z-index:-1;
-      filter: blur(8px);
-      opacity:.9;
-    }
-
     @media (max-width: 900px){
-      h1{font-size:34px}
-      .card{padding:42px 26px 36px}
-      .actions{height:140px}
-      button{font-size:18px; padding:16px 26px}
+      h1{font-size: 34px}
+      .card{padding: 42px 26px 36px}
+      .actions{height: 140px}
+      button{font-size: 18px; padding: 16px 26px}
       .no-spacer{width: 170px; height: 58px;}
+      #yeah{font-size: 40px}
+      .success h3{font-size: 34px}
     }
   </style>
 </head>
@@ -206,72 +210,71 @@
       <div class="glow"></div>
 
       <div class="content">
-       <h1 id="question">MOHINI, WILL YOU BE MY VALENTINE?</h1>
-
+        <h1 id="question">MOHINI, WILL YOU BE MY VALENTINE?</h1>
         <p class="sub" id="hint">Choose wisely 😉💘</p>
 
         <div class="actions" id="actions">
           <button class="yes" id="yesBtn">YES 💞</button>
 
-          <!-- this reserves the "side-by-side" position for NO -->
+          <!-- reserves a side-by-side spot for NO (so layout looks correct) -->
           <div class="no-spacer" id="noSpacer" aria-hidden="true"></div>
 
-          <!-- this is the real NO that runs away -->
+          <!-- actual NO that moves away -->
           <button class="no" id="noBtn" aria-hidden="true">NO 🙅‍♀️</button>
         </div>
+
         <div class="success" id="success">
-  <h2 id="yeah">YEAHHH 🥳🎉</h2>
-  <h2>I KNEW YOU LOVE ME</h2>
-  <img class="gif" alt="Dancing celebration" src="./dance.gif" />
-</div>
+          <div id="yeah">YEAHHH 🥳🎉</div>
+          <h3>I KNEW YOU LOVE ME</h3>
 
-
+          <!-- Put your GIF file in the same repo folder as index.html and name it: dance.gif -->
+          <img class="gif" alt="Dancing celebration" src="./dance.gif" />
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="graffiti" id="graffiti"></div>
-
   <script>
-    // Hearts
+    // ---------- Hearts ----------
     const heartsHost = document.getElementById("hearts");
     const heartEmojis = ["💗","💖","💘","💝","💞","💕","💓","❤️","🩷"];
-    function rand(min, max){ return Math.random()*(max-min)+min; }
+    function rand(min, max){ return Math.random() * (max - min) + min; }
 
-    for(let i=0;i<42;i++){
-      const s = document.createElement("div");
-      s.className = "heart";
-      s.textContent = heartEmojis[(Math.random()*heartEmojis.length)|0];
-      s.style.left = rand(0,100) + "vw";
-      s.style.fontSize = rand(14,34) + "px";
-      s.style.animationDuration = rand(6,14) + "s";
-      s.style.animationDelay = (-rand(0,10)) + "s";
-      s.style.opacity = rand(0.55,0.95);
-      heartsHost.appendChild(s);
+    for (let i = 0; i < 42; i++) {
+      const h = document.createElement("div");
+      h.className = "heart";
+      h.textContent = heartEmojis[(Math.random() * heartEmojis.length) | 0];
+      h.style.left = rand(0, 100) + "vw";
+      h.style.fontSize = rand(14, 34) + "px";
+      h.style.animationDuration = rand(6, 14) + "s";
+      h.style.animationDelay = (-rand(0, 10)) + "s";
+      h.style.opacity = rand(0.55, 0.95);
+      heartsHost.appendChild(h);
     }
 
-    // Buttons logic
+    // ---------- Buttons ----------
     const actions = document.getElementById("actions");
     const yesBtn = document.getElementById("yesBtn");
-    const noBtn  = document.getElementById("noBtn");
+    const noBtn = document.getElementById("noBtn");
     const noSpacer = document.getElementById("noSpacer");
 
-    // Put NO exactly on top of the spacer (side-by-side with YES)
-    function placeNoOnSpacer(){
+    // Put NO initially on top of the spacer (right side of YES)
+    function placeNoOnSpacer() {
       const a = actions.getBoundingClientRect();
       const s = noSpacer.getBoundingClientRect();
+
       const nW = noBtn.offsetWidth;
       const nH = noBtn.offsetHeight;
 
-      const left = (s.left - a.left) + (s.width - nW)/2;
-      const top  = (s.top  - a.top)  + (s.height - nH)/2;
+      const left = (s.left - a.left) + (s.width - nW) / 2;
+      const top  = (s.top  - a.top)  + (s.height - nH) / 2;
 
       noBtn.style.left = left + "px";
       noBtn.style.top  = top  + "px";
     }
 
-    // Move NO to a safe spot inside actions, never overlapping YES
-    function moveNoToSafeSpot(){
+    // Move NO somewhere inside actions, but never overlap YES
+    function moveNoToSafeSpot() {
       const a = actions.getBoundingClientRect();
       const y = yesBtn.getBoundingClientRect();
 
@@ -279,19 +282,21 @@
       const nH = noBtn.offsetHeight;
       const pad = 10;
 
+      // YES safe zone (bigger buffer so NO never covers it)
       const yesZone = {
-        left:  (y.left - a.left) - 40,
-        top:   (y.top  - a.top)  - 30,
-        right: (y.right- a.left) + 40,
-        bottom:(y.bottom-a.top)  + 30
+        left:  (y.left - a.left) - 50,
+        top:   (y.top  - a.top)  - 40,
+        right: (y.right- a.left) + 50,
+        bottom:(y.bottom-a.top)  + 40
       };
 
       const maxX = a.width - nW - pad;
       const maxY = a.height - nH - pad;
 
-      for(let i=0;i<70;i++){
+      for (let i = 0; i < 80; i++) {
         const xPos = rand(pad, Math.max(pad, maxX));
         const yPos = rand(pad, Math.max(pad, maxY));
+
         const noBox = { left:xPos, top:yPos, right:xPos+nW, bottom:yPos+nH };
 
         const overlapsYes =
@@ -300,82 +305,69 @@
             noBox.bottom < yesZone.top ||
             noBox.top > yesZone.bottom);
 
-        if(!overlapsYes){
+        if (!overlapsYes) {
           noBtn.style.left = xPos + "px";
           noBtn.style.top  = yPos + "px";
           return;
         }
       }
 
-      // fallback
+      // Fallback corner
       noBtn.style.left = Math.max(pad, maxX) + "px";
       noBtn.style.top  = pad + "px";
     }
 
-    // Run away when cursor comes near NO
+    // Run-away behavior: if cursor approaches NO, it moves
     document.addEventListener("mousemove", (e) => {
+      if (actions.style.display === "none") return; // after YES, ignore
+
       const b = noBtn.getBoundingClientRect();
-      const dx = e.clientX - (b.left + b.width/2);
-      const dy = e.clientY - (b.top + b.height/2);
-      if(Math.hypot(dx,dy) < 140) moveNoToSafeSpot();
-    }, {passive:true});
+      const dx = e.clientX - (b.left + b.width / 2);
+      const dy = e.clientY - (b.top + b.height / 2);
+      if (Math.hypot(dx, dy) < 140) moveNoToSafeSpot();
+    }, { passive:true });
 
-    // Touch devices
-    document.addEventListener("touchstart", () => moveNoToSafeSpot(), {passive:true});
-    document.addEventListener("touchmove",  () => moveNoToSafeSpot(), {passive:true});
+    // Touch support
+    document.addEventListener("touchstart", () => {
+      if (actions.style.display === "none") return;
+      moveNoToSafeSpot();
+    }, { passive:true });
 
-    // Initial placement + on resize
-    function init(){
-      placeNoOnSpacer();
-    }
-    requestAnimationFrame(() => requestAnimationFrame(init));
+    document.addEventListener("touchmove", () => {
+      if (actions.style.display === "none") return;
+      moveNoToSafeSpot();
+    }, { passive:true });
+
+    // Initial placement
+    requestAnimationFrame(() => requestAnimationFrame(placeNoOnSpacer));
     window.addEventListener("resize", placeNoOnSpacer);
 
-    // YES click -> success + graffiti
+    // YES click: hide question + show celebration
     const success = document.getElementById("success");
     const hint = document.getElementById("hint");
-    const graffiti = document.getElementById("graffiti");
-
-    const tags = ["LOVE","MOHINI 💘","FOREVER","YESSS!","MINE 😏","KISSES 💋","SOULMATES","VALENTINE","💞💞💞","I KNEW IT","CUTIES","SPARKS ✨"];
-
-    function makeGraffiti(){
-      graffiti.innerHTML = "";
-      graffiti.style.display = "block";
-      const W = window.innerWidth, H = window.innerHeight;
-      for(let i=0;i<30;i++){
-        const t = document.createElement("div");
-        t.className = "tag";
-        t.textContent = tags[(Math.random()*tags.length)|0];
-        t.style.left = rand(-40, W-120) + "px";
-        t.style.top  = rand(-20, H-60) + "px";
-        t.style.fontSize = rand(18,54) + "px";
-        t.style.setProperty("--rot", rand(-18,18) + "deg");
-        t.style.color = `hsl(${(Math.random()*360)|0} 95% 70%)`;
-        graffiti.appendChild(t);
-      }
-    }
+    const question = document.getElementById("question");
 
     yesBtn.addEventListener("click", () => {
-      success.style.display = "block";
-      hint.textContent = "Correct choice 😌💖";
+      // Hide the top question and hint
+      question.style.display = "none";
+      hint.style.display = "none";
+
+      // Hide buttons area, show success
       actions.style.display = "none";
+      success.style.display = "block";
 
-      // extra hearts
-      for(let i=0;i<18;i++){
-        const s = document.createElement("div");
-        s.className = "heart";
-        s.textContent = heartEmojis[(Math.random()*heartEmojis.length)|0];
-        s.style.left = rand(0,100) + "vw";
-        s.style.fontSize = rand(18,42) + "px";
-        s.style.animationDuration = rand(4.5,9) + "s";
-        s.style.animationDelay = rand(0,1) + "s";
-        heartsHost.appendChild(s);
+      // Add extra hearts for celebration
+      for (let i = 0; i < 18; i++) {
+        const h = document.createElement("div");
+        h.className = "heart";
+        h.textContent = heartEmojis[(Math.random() * heartEmojis.length) | 0];
+        h.style.left = rand(0, 100) + "vw";
+        h.style.fontSize = rand(18, 42) + "px";
+        h.style.animationDuration = rand(4.5, 9) + "s";
+        h.style.animationDelay = rand(0, 1) + "s";
+        h.style.opacity = rand(0.65, 0.98);
+        heartsHost.appendChild(h);
       }
-      
-    });
-
-    window.addEventListener("resize", () => {
-      if(graffiti.style.display === "block")
     });
   </script>
 </body>
