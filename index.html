@@ -97,15 +97,21 @@
       letter-spacing:.2px;
     }
 
-    /* Button row */
+    /* Button row: side-by-side */
     .actions{
-      position:relative;
+      position:relative;            /* NO will run inside this zone */
+      width: min(700px, 92%);
+      margin: 0 auto;
       display:flex;
-      gap: 18px;
       justify-content:center;
+      gap: 22px;
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      height: 120px;                /* playfield height */
       align-items:center;
-      margin-top: 16px;
-      height: 84px; /* keeps layout stable while NO runs away */
+      overflow:hidden;
     }
 
     button{
@@ -120,23 +126,26 @@
       transition: transform .12s ease, filter .12s ease;
       user-select:none;
       -webkit-tap-highlight-color: transparent;
+      white-space:nowrap;
     }
     button:active{transform: translateY(1px) scale(.99)}
+
     .yes{
       background: linear-gradient(135deg, var(--pink), var(--hot));
       color:#120713;
+      position:relative;
+      z-index:2;
     }
     .yes:hover{filter: brightness(1.06)}
+
+    /* NO starts beside YES, but is actually absolute so it can run around without affecting layout */
     .no{
       background: rgba(255,255,255,.12);
       color: rgba(255,255,255,.92);
       border: 1px solid rgba(255,255,255,.18);
-      position:absolute;
-      right: 18%;
-      top: 0;
-      transform: translateY(0);
-      /* Don’t allow clicking NO */
-      pointer-events:none;
+      position:absolute;     /* so it can move freely */
+      z-index:2;
+      pointer-events:none;   /* cannot be clicked */
     }
 
     /* Success screen */
@@ -196,12 +205,11 @@
       opacity:.9;
     }
 
-    /* Laptop-first: if super small, just scale down a bit */
     @media (max-width: 900px){
       h1{font-size: 34px}
       .card{padding: 42px 26px 36px}
-      .actions{height: 96px}
-      .no{right: 8%}
+      .actions{height: 130px}
+      button{font-size: 18px; padding: 16px 26px}
     }
   </style>
 </head>
@@ -215,7 +223,7 @@
 
       <div class="content">
         <h1 id="mainText">MOHINI, WILL YOU BE MY VALENTINE?</h1>
-        <p class="sub" id="hint">Choose wisely 😌💘</p>
+        <p class="sub" id="hint">Choose wisely 😉💘</p>
 
         <div class="actions" id="actions">
           <button class="yes" id="yesBtn">YES 💞</button>
@@ -224,7 +232,7 @@
 
         <div class="success" id="success">
           <h2>I KNEW YOU LOVE ME</h2>
-          <!-- You can swap this GIF URL to any dancing GIF you like -->
+          <!-- change gif if you want -->
           <img class="gif" alt="Dancing celebration"
                src="https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif" />
         </div>
@@ -247,101 +255,113 @@
       s.className = "heart";
       s.textContent = heartEmojis[(Math.random()*heartEmojis.length)|0];
 
-      const left = rand(0, 100);
-      const size = rand(14, 34);
-      const dur = rand(6, 14);
-      const delay = rand(0, 10);
-
-      s.style.left = left + "vw";
-      s.style.fontSize = size + "px";
-      s.style.animationDuration = dur + "s";
-      s.style.animationDelay = (-delay) + "s"; // start mid-flight
+      s.style.left = rand(0, 100) + "vw";
+      s.style.fontSize = rand(14, 34) + "px";
+      s.style.animationDuration = rand(6, 14) + "s";
+      s.style.animationDelay = (-rand(0, 10)) + "s";
       s.style.opacity = rand(0.55, 0.95);
-
-      // slight horizontal drift via CSS variable
-      const drift = rand(-40, 40);
-      s.style.transform = `translate3d(${drift}px, 110vh, 0) rotate(${rand(0,360)}deg)`;
 
       heartsHost.appendChild(s);
     }
 
-    // ----- NO button runs away (and cannot be clicked) -----
-    const noBtn = document.getElementById("noBtn");
+    // ----- Buttons logic -----
     const actions = document.getElementById("actions");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn  = document.getElementById("noBtn");
 
-   function placeNoRandomly(){
-  const a = actions.getBoundingClientRect();
-  const y = yesBtn.getBoundingClientRect();
-  const nW = noBtn.offsetWidth;
-  const nH = noBtn.offsetHeight;
+    // Place NO initially to the right of YES (side-by-side)
+    function placeNoBesideYes(){
+      const a = actions.getBoundingClientRect();
+      const y = yesBtn.getBoundingClientRect();
 
-  const padding = 8;
+      // relative coords inside actions
+      const x = (y.right - a.left) + 22; // gap
+      const yTop = (y.top - a.top);
 
-  // YES button position relative to the actions container
-  const yesLeft = y.left - a.left;
-  const yesTop  = y.top  - a.top;
-
-  // Safe zone around YES (bigger = more separation)
-  const safe = {
-    left: yesLeft - 22,
-    top: yesTop - 18,
-    right: yesLeft + y.width + 22,
-    bottom: yesTop + y.height + 18
-  };
-
-  const maxX = a.width - nW - padding;
-  const maxY = a.height - nH - padding;
-
-  // Try multiple random spots until it's not overlapping the safe zone
-  for(let i = 0; i < 40; i++){
-    const xPos = rand(padding, Math.max(padding, maxX));
-    const yPos = rand(padding, Math.max(padding, maxY));
-
-    const noBox = {
-      left: xPos,
-      top: yPos,
-      right: xPos + nW,
-      bottom: yPos + nH
-    };
-
-    const overlaps =
-      !(noBox.right < safe.left ||
-        noBox.left > safe.right ||
-        noBox.bottom < safe.top ||
-        noBox.top > safe.bottom);
-
-    if(!overlaps){
-      noBtn.style.left = xPos + "px";
-      noBtn.style.top  = yPos + "px";
-      return;
+      noBtn.style.left = Math.min(x, a.width - noBtn.offsetWidth - 10) + "px";
+      noBtn.style.top  = Math.max(10, Math.min(yTop, a.height - noBtn.offsetHeight - 10)) + "px";
     }
-  }
 
-  // Fallback: put NO far right if we somehow couldn't find a spot
-  noBtn.style.left = Math.max(padding, maxX) + "px";
-  noBtn.style.top  = padding + "px";
-}
+    // Keep NO away from YES (no overlap ever)
+    function moveNoToSafeSpot(){
+      const a = actions.getBoundingClientRect();
+      const y = yesBtn.getBoundingClientRect();
 
+      const nW = noBtn.offsetWidth;
+      const nH = noBtn.offsetHeight;
+      const pad = 10;
 
-    // Make sure NO starts somewhere sensible
-    requestAnimationFrame(placeNoRandomly);
-    window.addEventListener("resize", placeNoRandomly);
+      // YES safe zone (expand it so NO never covers it)
+      const yesZone = {
+        left:  (y.left - a.left) - 30,
+        top:   (y.top  - a.top)  - 24,
+        right: (y.right- a.left) + 30,
+        bottom:(y.bottom-a.top)  + 24
+      };
 
-    // Move away when cursor gets near the NO area
-    document.addEventListener("mousemove", (e) => {
+      const maxX = a.width - nW - pad;
+      const maxY = a.height - nH - pad;
+
+      for(let i=0;i<60;i++){
+        const xPos = rand(pad, Math.max(pad, maxX));
+        const yPos = rand(pad, Math.max(pad, maxY));
+
+        const noBox = { left:xPos, top:yPos, right:xPos+nW, bottom:yPos+nH };
+
+        const overlapsYes =
+          !(noBox.right < yesZone.left ||
+            noBox.left > yesZone.right ||
+            noBox.bottom < yesZone.top ||
+            noBox.top > yesZone.bottom);
+
+        if(!overlapsYes){
+          noBtn.style.left = xPos + "px";
+          noBtn.style.top  = yPos + "px";
+          return;
+        }
+      }
+
+      // fallback corner
+      noBtn.style.left = Math.max(pad, maxX) + "px";
+      noBtn.style.top  = pad + "px";
+    }
+
+    // Run-away behavior (mouse proximity)
+    function handleMouseMove(e){
       const b = noBtn.getBoundingClientRect();
       const dx = e.clientX - (b.left + b.width/2);
       const dy = e.clientY - (b.top + b.height/2);
       const dist = Math.hypot(dx, dy);
 
-      if(dist < 130){ placeNoRandomly(); }
-    }, {passive:true});
+      // If cursor comes close, move away
+      if(dist < 140){
+        moveNoToSafeSpot();
+      }
+    }
 
-    // Touch support: move away as soon as finger approaches
-    document.addEventListener("touchstart", () => placeNoRandomly(), {passive:true});
+    // Touch support: move NO away on touch
+    function handleTouch(){
+      moveNoToSafeSpot();
+    }
+
+    // Initial placement after layout is ready
+    function initNo(){
+      placeNoBesideYes();
+    }
+
+    window.addEventListener("resize", () => {
+      // keep it beside yes after resize, unless user already started chasing it
+      placeNoBesideYes();
+    });
+
+    document.addEventListener("mousemove", handleMouseMove, {passive:true});
+    document.addEventListener("touchstart", handleTouch, {passive:true});
+    document.addEventListener("touchmove", handleTouch, {passive:true});
+
+    // Kick off after first paint
+    requestAnimationFrame(() => requestAnimationFrame(initNo));
 
     // ----- YES click: show message + gif + graffiti everywhere -----
-    const yesBtn = document.getElementById("yesBtn");
     const success = document.getElementById("success");
     const hint = document.getElementById("hint");
     const graffiti = document.getElementById("graffiti");
@@ -358,7 +378,7 @@
       const W = window.innerWidth;
       const H = window.innerHeight;
 
-      const count = 28; // "everywhere"
+      const count = 28;
       for(let i=0;i<count;i++){
         const t = document.createElement("div");
         t.className = "tag";
@@ -369,7 +389,6 @@
         const y = rand(-20, H - 60);
         const rot = rand(-18, 18) + "deg";
 
-        // bright random-ish color
         const hue = (Math.random()*360)|0;
         t.style.color = `hsl(${hue} 95% 70%)`;
         t.style.fontSize = size + "px";
@@ -384,10 +403,11 @@
     yesBtn.addEventListener("click", () => {
       success.style.display = "block";
       hint.textContent = "Correct choice 😌💖";
-      // Hide buttons area after selection
-      document.getElementById("actions").style.display = "none";
 
-      // More hearts vibe: add a few extra faster hearts
+      // hide buttons area
+      actions.style.display = "none";
+
+      // add extra hearts
       for(let i=0;i<18;i++){
         const s = document.createElement("div");
         s.className = "heart";
@@ -402,7 +422,6 @@
       makeGraffiti();
     });
 
-    // Keep graffiti looking “everywhere” if window changes
     window.addEventListener("resize", () => {
       if(graffiti.style.display === "block") makeGraffiti();
     });
