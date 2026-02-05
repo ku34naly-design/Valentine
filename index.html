@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Valentine 💘</title>
+  <style>
+    :root{
+      --bg1:#0b0b12;
+      --bg2:#140b1b;
+      --pink:#ff4fd8;
+      --hot:#ff2e63;
+      --neon:#7c4dff;
+      --white:#ffffff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      height:100vh;
+      overflow:hidden;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 50% 30%, #2a0f2f 0%, var(--bg2) 35%, var(--bg1) 100%);
+      color: var(--white);
+    }
+
+    /* Floating hearts background */
+    .hearts{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      z-index:0;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.35));
+    }
+    .heart{
+      position:absolute;
+      font-size: 18px;
+      opacity:.9;
+      animation: floatUp linear infinite;
+      will-change: transform, opacity;
+      text-shadow: 0 8px 18px rgba(0,0,0,.35);
+    }
+    @keyframes floatUp{
+      0%   {transform: translate3d(0, 110vh, 0) rotate(0deg) scale(1); opacity:0}
+      10%  {opacity:.95}
+      100% {transform: translate3d(0, -20vh, 0) rotate(360deg) scale(1.35); opacity:0}
+    }
+
+    /* Main card */
+    .wrap{
+      position:relative;
+      z-index:2;
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 40px;
+    }
+    .card{
+      width:min(980px, 92vw);
+      border-radius: 28px;
+      padding: 56px 56px 44px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 24px 70px rgba(0,0,0,.45);
+      position:relative;
+      overflow:hidden;
+    }
+    .glow{
+      position:absolute;
+      inset:-60px;
+      background:
+        radial-gradient(400px 250px at 20% 20%, rgba(255,79,216,.22), transparent 65%),
+        radial-gradient(500px 300px at 80% 30%, rgba(124,77,255,.18), transparent 70%),
+        radial-gradient(600px 360px at 55% 90%, rgba(255,46,99,.14), transparent 70%);
+      z-index:0;
+      pointer-events:none;
+    }
+    .content{position:relative; z-index:1}
+
+    h1{
+      margin:0 0 26px;
+      font-size: 44px;
+      line-height:1.12;
+      letter-spacing: .8px;
+      font-weight: 900;
+      text-transform: uppercase;
+      text-align:center;
+      text-shadow: 0 10px 28px rgba(0,0,0,.55);
+    }
+    .sub{
+      text-align:center;
+      margin: 0 0 34px;
+      opacity:.85;
+      font-weight: 600;
+      letter-spacing:.2px;
+    }
+
+    /* Button row */
+    .actions{
+      position:relative;
+      display:flex;
+      gap: 18px;
+      justify-content:center;
+      align-items:center;
+      margin-top: 16px;
+      height: 84px; /* keeps layout stable while NO runs away */
+    }
+
+    button{
+      border:0;
+      cursor:pointer;
+      padding: 18px 34px;
+      border-radius: 18px;
+      font-weight: 900;
+      letter-spacing:.6px;
+      font-size: 20px;
+      box-shadow: 0 18px 36px rgba(0,0,0,.35);
+      transition: transform .12s ease, filter .12s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button:active{transform: translateY(1px) scale(.99)}
+    .yes{
+      background: linear-gradient(135deg, var(--pink), var(--hot));
+      color:#120713;
+    }
+    .yes:hover{filter: brightness(1.06)}
+    .no{
+      background: rgba(255,255,255,.12);
+      color: rgba(255,255,255,.92);
+      border: 1px solid rgba(255,255,255,.18);
+      position:absolute;
+      right: 18%;
+      top: 0;
+      transform: translateY(0);
+      /* Don’t allow clicking NO */
+      pointer-events:none;
+    }
+
+    /* Success screen */
+    .success{
+      display:none;
+      text-align:center;
+      margin-top: 18px;
+    }
+    .success h2{
+      margin: 10px 0 10px;
+      font-size: 40px;
+      font-weight: 1000;
+      letter-spacing:.8px;
+      text-transform: uppercase;
+      text-shadow: 0 10px 28px rgba(0,0,0,.55);
+    }
+    .gif{
+      width:min(520px, 80%);
+      border-radius: 22px;
+      margin: 14px auto 0;
+      display:block;
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 24px 70px rgba(0,0,0,.45);
+    }
+
+    /* Graffiti layer */
+    .graffiti{
+      position:fixed;
+      inset:0;
+      z-index:3;
+      pointer-events:none;
+      display:none;
+    }
+    .tag{
+      position:absolute;
+      font-weight: 1000;
+      letter-spacing:.5px;
+      transform: rotate(var(--rot));
+      opacity:.92;
+      text-shadow:
+        0 2px 0 rgba(0,0,0,.25),
+        0 10px 24px rgba(0,0,0,.45);
+      filter: saturate(1.25);
+      mix-blend-mode: screen;
+      white-space:nowrap;
+    }
+    .tag::after{
+      content:"";
+      position:absolute;
+      inset:-10px -14px;
+      border-radius: 18px;
+      background: radial-gradient(120px 60px at 30% 40%, rgba(255,79,216,.25), transparent 70%),
+                  radial-gradient(130px 70px at 70% 60%, rgba(124,77,255,.22), transparent 70%),
+                  radial-gradient(120px 60px at 40% 70%, rgba(255,46,99,.22), transparent 70%);
+      z-index:-1;
+      filter: blur(8px);
+      opacity:.9;
+    }
+
+    /* Laptop-first: if super small, just scale down a bit */
+    @media (max-width: 900px){
+      h1{font-size: 34px}
+      .card{padding: 42px 26px 36px}
+      .actions{height: 96px}
+      .no{right: 8%}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hearts" id="hearts"></div>
+
+  <div class="wrap">
+    <div class="card" id="card">
+      <div class="glow"></div>
+
+      <div class="content">
+        <h1 id="mainText">MOHINI, WILL YOU BE MY VALENTINE?</h1>
+        <p class="sub" id="hint">Choose wisely 😌💘</p>
+
+        <div class="actions" id="actions">
+          <button class="yes" id="yesBtn">YES 💞</button>
+          <button class="no" id="noBtn" aria-hidden="true">NO 🙅‍♀️</button>
+        </div>
+
+        <div class="success" id="success">
+          <h2>I KNEW YOU LOVE ME</h2>
+          <!-- You can swap this GIF URL to any dancing GIF you like -->
+          <img class="gif" alt="Dancing celebration"
+               src="https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="graffiti" id="graffiti"></div>
+
+  <script>
+    // ----- Floating hearts -----
+    const heartsHost = document.getElementById("hearts");
+    const heartEmojis = ["💗","💖","💘","💝","💞","💕","💓","❤️","🩷"];
+    const HEART_COUNT = 42;
+
+    function rand(min, max){ return Math.random() * (max - min) + min; }
+
+    for(let i=0;i<HEART_COUNT;i++){
+      const s = document.createElement("div");
+      s.className = "heart";
+      s.textContent = heartEmojis[(Math.random()*heartEmojis.length)|0];
+
+      const left = rand(0, 100);
+      const size = rand(14, 34);
+      const dur = rand(6, 14);
+      const delay = rand(0, 10);
+
+      s.style.left = left + "vw";
+      s.style.fontSize = size + "px";
+      s.style.animationDuration = dur + "s";
+      s.style.animationDelay = (-delay) + "s"; // start mid-flight
+      s.style.opacity = rand(0.55, 0.95);
+
+      // slight horizontal drift via CSS variable
+      const drift = rand(-40, 40);
+      s.style.transform = `translate3d(${drift}px, 110vh, 0) rotate(${rand(0,360)}deg)`;
+
+      heartsHost.appendChild(s);
+    }
+
+    // ----- NO button runs away (and cannot be clicked) -----
+    const noBtn = document.getElementById("noBtn");
+    const actions = document.getElementById("actions");
+
+    function placeNoRandomly(){
+      const rect = actions.getBoundingClientRect();
+
+      // Keep it within the action bar area, avoid overlapping YES too much
+      const padding = 6;
+      const maxX = rect.width - noBtn.offsetWidth - padding;
+      const maxY = rect.height - noBtn.offsetHeight - padding;
+
+      const x = rand(padding, Math.max(padding, maxX));
+      const y = rand(padding, Math.max(padding, maxY));
+
+      noBtn.style.left = x + "px";
+      noBtn.style.top = y + "px";
+    }
+
+    // Make sure NO starts somewhere sensible
+    requestAnimationFrame(placeNoRandomly);
+    window.addEventListener("resize", placeNoRandomly);
+
+    // Move away when cursor gets near the NO area
+    document.addEventListener("mousemove", (e) => {
+      const b = noBtn.getBoundingClientRect();
+      const dx = e.clientX - (b.left + b.width/2);
+      const dy = e.clientY - (b.top + b.height/2);
+      const dist = Math.hypot(dx, dy);
+
+      if(dist < 130){ placeNoRandomly(); }
+    }, {passive:true});
+
+    // Touch support: move away as soon as finger approaches
+    document.addEventListener("touchstart", () => placeNoRandomly(), {passive:true});
+
+    // ----- YES click: show message + gif + graffiti everywhere -----
+    const yesBtn = document.getElementById("yesBtn");
+    const success = document.getElementById("success");
+    const hint = document.getElementById("hint");
+    const graffiti = document.getElementById("graffiti");
+
+    const tags = [
+      "LOVE", "MOHINI 💘", "FOREVER", "YESSS!", "MINE 😏", "KISSES 💋",
+      "SOULMATES", "VALENTINE", "💞💞💞", "I KNEW IT", "CUTIES", "SPARKS ✨"
+    ];
+
+    function makeGraffiti(){
+      graffiti.innerHTML = "";
+      graffiti.style.display = "block";
+
+      const W = window.innerWidth;
+      const H = window.innerHeight;
+
+      const count = 28; // "everywhere"
+      for(let i=0;i<count;i++){
+        const t = document.createElement("div");
+        t.className = "tag";
+        t.textContent = tags[(Math.random()*tags.length)|0];
+
+        const size = rand(18, 54);
+        const x = rand(-40, W - 120);
+        const y = rand(-20, H - 60);
+        const rot = rand(-18, 18) + "deg";
+
+        // bright random-ish color
+        const hue = (Math.random()*360)|0;
+        t.style.color = `hsl(${hue} 95% 70%)`;
+        t.style.fontSize = size + "px";
+        t.style.left = x + "px";
+        t.style.top = y + "px";
+        t.style.setProperty("--rot", rot);
+
+        graffiti.appendChild(t);
+      }
+    }
+
+    yesBtn.addEventListener("click", () => {
+      success.style.display = "block";
+      hint.textContent = "Correct choice 😌💖";
+      // Hide buttons area after selection
+      document.getElementById("actions").style.display = "none";
+
+      // More hearts vibe: add a few extra faster hearts
+      for(let i=0;i<18;i++){
+        const s = document.createElement("div");
+        s.className = "heart";
+        s.textContent = heartEmojis[(Math.random()*heartEmojis.length)|0];
+        s.style.left = rand(0, 100) + "vw";
+        s.style.fontSize = rand(18, 42) + "px";
+        s.style.animationDuration = rand(4.5, 9) + "s";
+        s.style.animationDelay = rand(0, 1) + "s";
+        heartsHost.appendChild(s);
+      }
+
+      makeGraffiti();
+    });
+
+    // Keep graffiti looking “everywhere” if window changes
+    window.addEventListener("resize", () => {
+      if(graffiti.style.display === "block") makeGraffiti();
+    });
+  </script>
+</body>
+</html>
