@@ -269,20 +269,59 @@
     const noBtn = document.getElementById("noBtn");
     const actions = document.getElementById("actions");
 
-    function placeNoRandomly(){
-      const rect = actions.getBoundingClientRect();
+   function placeNoRandomly(){
+  const a = actions.getBoundingClientRect();
+  const y = yesBtn.getBoundingClientRect();
+  const nW = noBtn.offsetWidth;
+  const nH = noBtn.offsetHeight;
 
-      // Keep it within the action bar area, avoid overlapping YES too much
-      const padding = 6;
-      const maxX = rect.width - noBtn.offsetWidth - padding;
-      const maxY = rect.height - noBtn.offsetHeight - padding;
+  const padding = 8;
 
-      const x = rand(padding, Math.max(padding, maxX));
-      const y = rand(padding, Math.max(padding, maxY));
+  // YES button position relative to the actions container
+  const yesLeft = y.left - a.left;
+  const yesTop  = y.top  - a.top;
 
-      noBtn.style.left = x + "px";
-      noBtn.style.top = y + "px";
+  // Safe zone around YES (bigger = more separation)
+  const safe = {
+    left: yesLeft - 22,
+    top: yesTop - 18,
+    right: yesLeft + y.width + 22,
+    bottom: yesTop + y.height + 18
+  };
+
+  const maxX = a.width - nW - padding;
+  const maxY = a.height - nH - padding;
+
+  // Try multiple random spots until it's not overlapping the safe zone
+  for(let i = 0; i < 40; i++){
+    const xPos = rand(padding, Math.max(padding, maxX));
+    const yPos = rand(padding, Math.max(padding, maxY));
+
+    const noBox = {
+      left: xPos,
+      top: yPos,
+      right: xPos + nW,
+      bottom: yPos + nH
+    };
+
+    const overlaps =
+      !(noBox.right < safe.left ||
+        noBox.left > safe.right ||
+        noBox.bottom < safe.top ||
+        noBox.top > safe.bottom);
+
+    if(!overlaps){
+      noBtn.style.left = xPos + "px";
+      noBtn.style.top  = yPos + "px";
+      return;
     }
+  }
+
+  // Fallback: put NO far right if we somehow couldn't find a spot
+  noBtn.style.left = Math.max(padding, maxX) + "px";
+  noBtn.style.top  = padding + "px";
+}
+
 
     // Make sure NO starts somewhere sensible
     requestAnimationFrame(placeNoRandomly);
